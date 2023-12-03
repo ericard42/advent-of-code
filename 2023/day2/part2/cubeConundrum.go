@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -18,21 +19,18 @@ func errorCheck(err error) {
 func parseLine(line string) int {
 	index := strings.Index(line, ":")
 	line = line[index+2:]
-	splitedLine := strings.Split(line, "; ")
 	minValue := map[string]int{
 		"red":   0,
 		"green": 0,
 		"blue":  0,
 	}
-	for i := 0; i < len(splitedLine); i++ {
-		tmpSplit := strings.Split(splitedLine[i], ", ")
-		for j := 0; j < len(tmpSplit); j++ {
-			keyValue := strings.Split(tmpSplit[j], " ")
-			value, err := strconv.Atoi(keyValue[0])
-			if minValue[keyValue[1]] < value {
-				minValue[keyValue[1]] = value
-			}
-			errorCheck(err)
+	re := regexp.MustCompile(`(\d+)\s(\w+)`)
+	keyValue := re.FindAllStringSubmatch(line, -1)
+	for i := 0; i < len(keyValue); i++ {
+		value, err := strconv.Atoi(keyValue[i][1])
+		errorCheck(err)
+		if minValue[keyValue[i][2]] < value {
+			minValue[keyValue[i][2]] = value
 		}
 	}
 	return minValue["red"] * minValue["green"] * minValue["blue"]
