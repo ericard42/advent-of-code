@@ -14,6 +14,8 @@ func errorCheck(e error) {
 	}
 }
 
+var addCards []int
+
 func parseLine(line string) int {
 	index := strings.Index(line, ":")
 	line = line[index+2:]
@@ -29,14 +31,23 @@ func parseLine(line string) int {
 		re := regexp.MustCompile(` ` + winner + ` | ` + winner + `$|^` + winner + ` `)
 		matches := re.MatchString(checks)
 		if matches {
-			if total == 0 {
-				total = 1
-			} else {
-				total *= 2
-			}
+			total++
 		}
 	}
-	return total
+	nowAdd := 0
+	if len(addCards) > 0 {
+		nowAdd = addCards[0]
+		addCards = addCards[1:]
+	}
+	for i := 0; i < total; i++ {
+		if i >= len(addCards) {
+			addCards = append(addCards, nowAdd+1)
+		} else {
+			addCards[i] = addCards[i] + nowAdd + 1
+		}
+	}
+
+	return nowAdd + 1
 }
 
 func main() {
